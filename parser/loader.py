@@ -4,9 +4,10 @@ import pandas as pd
 import os
 import json
 import time
+from utils import get_season, get_seasons, write_data
 
-base_site = "https://www.basketball-reference.com"
-base_url = lambda day, month, year: f"{base_site}/boxscores/?month={month}&day={day}&year={year}"
+base_site = 'https://www.basketball-reference.com'
+base_url = lambda day, month, year: f'{base_site}/boxscores/?month={month}&day={day}&year={year}'
 
 def load_page(url):
     time.sleep(3)
@@ -15,12 +16,13 @@ def load_page(url):
 
 def load_game(url, date):
     page = load_page(url)
-    season = page.select('u')[-1].contents[0][:4]
+    # season = page.select('u')[-1].contents[0][:4]
+    season = get_season(date)
     datetime = date.strftime('%Y-%m-%d')
     team1 = page.findAll('li', {'class': 'full'})[1].find('a')['href'].split('/')[2]
     team2 = page.findAll('li', {'class': 'full'})[2].find('a')['href'].split('/')[2]
     
-    game_path = lambda x='': f'./data/{season}/{datetime + team1 + "-" + team2}/' + x
+    game_path = lambda x='': f"./data/{season + 1}/{datetime + team1 + '-' + team2}/" + x
     
     os.makedirs(game_path(), exist_ok=True)
     
@@ -57,10 +59,8 @@ def load_game(url, date):
     inactive = dict()
     inactive[team1] = inactive1
     inactive[team2] = inactive2
-    f = open(game_path('inactive.json'), 'w')
-    json.dump(inactive, f)
-    f.truncate()
-    f.close()
+
+    write_data(game_path('inactive.json'), inactive)
     
 
 def load_games(date):
@@ -73,11 +73,30 @@ def load_games(date):
     for link in gamelinks:
         load_game(base_site + link, date)
 
-def load_dates(period = pd.date_range(start="2022-12-01", end="2023-01-03")):
+def load_dates(period = pd.date_range(start='2022-12-01', end='2023-01-03')):
     total_time = len(period)
     i = 0
+    load_players(period)
     print('Total dates to be loaded:', total_time)
     for date in period:
         load_games(date)
-        print(f"Completed {(i+1)}/{total_time}")
+        print(f'Completed {(i+1)}/{total_time}')
         i+=1
+
+def load_season_players(season):
+    positions = {}
+    url = f'https://www.basketball-reference.com/leagues/NBA_{season}_totals.html'
+    page = load_page(url)
+    table = page.find('table', {'id':'totals_stats'})
+    players = pd.read_html(str(table))[0]
+    for _, player in players.iterrows():
+        name, team, position = player['Player'], player['Tm'], player['Pos']
+        if positions.get(team) == None:
+            positions[team] = {}
+        positions[team][name] = position
+    filepath = f'./data/{season}/positions.json'
+    write_data(filepath, positions)
+
+def load_players(period):
+    for season in get_seasons(period):
+        load_season_players(season)

@@ -1,36 +1,37 @@
-import os
 import json
 import pandas as pd
 from numpy import nan
+from utils import lower_bound
 
-def lower_bound(array, element):
-    left = 0
-    right = len(array) - 1
-    while (right - left > 1):
-        middle = (left + right) // 2
-        if array[middle] > element: right = middle
-        else: left = middle
-    return right
-
-def process_data(games):
+def process_data(games, season, team):
     data = dict()
     players = set(games[-1])
     for player in players:
         statline = set()
         for game in games:
-            statline = statline | set(game[player])
-        data[player] = {k : sum(map(lambda x: 0 if x[player].get(k) == None else x[player][k], games)) for k in statline}
+            if game.get(player) != None:
+                statline = statline | set(game[player])
+        data[player] = {k : sum(map(lambda game: 0 if game.get(player) == None or game[player].get(k) == None else game[player][k], games)) for k in statline}
     for player in players:
         if player == 'factors': continue
+        try : data[player]['games_played']
+        except: print(data)
         if data[player]['games_played']:
             data[player] = {k : data[player][k] / data[player]['games_played'] for k in set(data[player])}
+            data[player] = {stat : round(data[player][stat], 2) for stat in set(data[player])}
         del data[player]['games_played']
         games_skipped = 0
         game_index = len(games) - 1
-        while game_index >= 0 and games[game_index][player]['games_played'] == 0:
+        while game_index >= 0 and games[game_index].get(player) != None and games[game_index][player]['games_played'] == 0:
             game_index -= 1
         games_skipped = len(games) - (game_index + 1)
         data[player]['games_skipped'] = games_skipped
+        if 'Starter' not in data[player]:
+            data[player]['Starter'] = 0
+        data[player]['position'] = get_position(player, team, season)
+    data['factors'] = {k : data['factors'][k] / len(games) for k in set(data['factors'])}
+    data = {'players':data, 'factors':data['factors']}
+    del data['players']['factors']
     return data
 
 def load_player_data(player, data):
@@ -65,8 +66,8 @@ def load_game_data(team, game_path):
     
     for player in inactive[team]:
         data[player] = {'games_played': 0}
-    
-    return data
+
+    return data, float(basic.iloc[-1]['PTS'])
 
 def load(season, team, start, end):
     index = json.load(open(f"./data/{season}/index/index.json", "r"))[team]
@@ -80,9 +81,16 @@ def load(season, team, start, end):
     
     games = []
     for date_index in range(start_game, end_game + 1):
-        games.append(load_game_data(team, f"./data/{season}/{index[date_index]}/"))
-    data = process_data(games)
-        
-    json.dump(data, open("stats.json", "w"))
+        game_data = load_game_data(team, f"./data/{season}/{index[date_index]}/")
+        games.append(game_data[0])
+    data = process_data(games, season, team)
     
     return data
+
+def get_position(player, team, season):
+    positions_path = f'./data/{season}/positions.json'
+    positions = json.load(open(positions_path))
+    try:
+        return positions[team][player]
+    except:
+        return 'PG'

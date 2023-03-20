@@ -8,12 +8,13 @@ def check_team(data, team):
 def check_index(index_path):
     if os.path.exists(index_path):
         return
-    f = open(index_path, "w")
-    f.write('{}')
+    os.mkdir(index_path)
+    f = open(index_path + "/index.json", "w")
+    f.write("{}")
     f.close()
 
 def load_data(season, game, team):
-    check_index(f"./data/{season}/index/index.json") 
+    check_index(f"./data/{season}/index/") 
     f = open(f"./data/{season}/index/index.json", "r+")
     data = json.load(f)
     check_team(data, team)

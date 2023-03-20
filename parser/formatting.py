@@ -9,6 +9,8 @@ def format_stats_data(data):
     data = data.drop(5)
     data = data.replace('Did Not Play', nan)
     data = data.replace('Did Not Dress', nan)
+    data = data.replace('Player Suspended', nan)
+    data = data.replace('Not With Team', nan)
     data['MP'] = data['MP'].map(lambda x: int(x.split(':')[0]) if type(x) == str and ':' in x else x)
     return data
 
@@ -29,5 +31,5 @@ def format_game_data(season, game):
             
 def format_season(season):
     for game in os.listdir(f"./data/{season}"):
-        if game[:4] == str(season) or game[:4] == str(season + 1):
+        if len(game) > 15:
             format_game_data(season, game)
