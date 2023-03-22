@@ -33,7 +33,7 @@ for i in range(bank):
     model_error = rand(-1, 1) * model_precision
     model_prediction = Bet(probability.p1 + model_error, probability.p2 - model_error)
     stake = eval_stake(model_prediction, bookmaker_prediction)
-    if stake[1] > 0:
+    if stake[1] > 0.3:
         initial_win = win
         if rand(0, 1) < probability.p1:
             win += stake[0] * bookmaker_prediction.c1 - 1

@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from numpy import nan
+from utils import get_seasons
 
 def format_stats_data(data):
     data = data.drop('Unnamed: 0', axis=1)
@@ -33,3 +34,7 @@ def format_season(season):
     for game in os.listdir(f"./data/{season}"):
         if len(game) > 15:
             format_game_data(season, game)
+
+def format_seasons(period):
+    for season in get_seasons(period):
+        format_season(season)

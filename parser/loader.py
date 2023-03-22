@@ -16,13 +16,12 @@ def load_page(url):
 
 def load_game(url, date):
     page = load_page(url)
-    # season = page.select('u')[-1].contents[0][:4]
     season = get_season(date)
     datetime = date.strftime('%Y-%m-%d')
     team1 = page.findAll('li', {'class': 'full'})[1].find('a')['href'].split('/')[2]
     team2 = page.findAll('li', {'class': 'full'})[2].find('a')['href'].split('/')[2]
     
-    game_path = lambda x='': f"./data/{season + 1}/{datetime + team1 + '-' + team2}/" + x
+    game_path = lambda x='': f"./data/{season}/{datetime + team1 + '-' + team2}/" + x
     
     os.makedirs(game_path(), exist_ok=True)
     

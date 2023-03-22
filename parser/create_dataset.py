@@ -13,7 +13,7 @@ def get_starters(game_data):
     starters = dict(map(lambda x: (x, list(game_data['players'].keys())[0]), ['PG', 'SG', 'SF', 'PF', 'C']))
     for player, player_data in game_data['players'].items():
         position = player_data['position']
-        if starters[position] == -1 or (player_data['Starter'] > game_data['players'][starters[position]]['Starter'] or (player_data.get('PTS', 0) > game_data['players'][starters[position]].get('PTS', 0))) and player_data['games_skipped'] < skipped_games_barrier:
+        if starters[position] == -1 or player_data.get('MP', 0) > game_data['players'][starters[position]].get('MP', 0) and player_data['games_skipped'] < skipped_games_barrier:
             starters[position] = player
     return starters.values()
 
@@ -62,12 +62,11 @@ def get_columns():
     return home_column + visitor_column + ['Winner']
 
 def create_dataset():
-    df = pd.DataFrame(columns=get_columns())
-    # for season in os.listdir(datadir):
-    for season in ['2023']:
+    for season in os.listdir(datadir):
+        df = pd.DataFrame(columns=get_columns())
         for game in os.listdir(datadir + season):
             if len(game) > 15:
                 record = create_game_record(season, game)
                 df.loc[len(df)] = record
-    df.to_csv("example.csv", index=False)
-        
+        df.to_csv(f'dataset/season{season}.csv', index=False)
+        print(f'Loaded season {season}')

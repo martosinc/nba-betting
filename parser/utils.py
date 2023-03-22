@@ -1,4 +1,5 @@
 import json
+import os
 
 def lower_bound(array, element):
     left = 0
@@ -18,6 +19,7 @@ def get_seasons(period):
     return range(get_season(period[0]), get_season(period[-1]) + 1)
 
 def write_data(path, data):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     f = open(path, 'w')
     json.dump(data, f)
     f.truncate()
