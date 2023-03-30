@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from numpy import nan
-from utils import get_seasons
+from .utils import get_seasons
 
 def format_stats_data(data):
     data = data.drop('Unnamed: 0', axis=1)

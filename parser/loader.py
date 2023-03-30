@@ -2,9 +2,8 @@ from bs4 import BeautifulSoup as bs, Comment, Tag
 import requests
 import pandas as pd
 import os
-import json
 import time
-from utils import get_season, get_seasons, write_data
+from .utils import get_season, get_seasons, write_data
 
 base_site = 'https://www.basketball-reference.com'
 base_url = lambda day, month, year: f'{base_site}/boxscores/?month={month}&day={day}&year={year}'

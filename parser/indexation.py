@@ -1,5 +1,5 @@
 import os, json
-from utils import get_seasons
+from .utils import get_seasons
 
 def check_team(data, team):
     if team in data:
@@ -31,7 +31,8 @@ def game_index(season, game):
     load_data(season, game, team2)
 
 def index_season(season):
-    for game in os.listdir(f"./data/{season}/"):
+    for game in sorted(os.listdir(f"./data/{season}/")):
+        print(game)
         if len(game) > 15:
             game_index(season, game)
 
