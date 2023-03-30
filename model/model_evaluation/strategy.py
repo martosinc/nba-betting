@@ -8,6 +8,7 @@ def bet(bank, prediction, bookmaker, threshold=0.3):
     value, stake = evaluate(prediction, bookmaker)
     if value > 0:
         return [stake * (1 - threshold + value) * bank, (1 - stake) * (1 - threshold + value) * bank]
+        # return [stake * bank, (1 - stake) * bank]
     return [0, 0]
 
     

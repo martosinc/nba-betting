@@ -1,0 +1,7 @@
+.ipynb_checkpoints
+data*/
+catboost_info
+__pycache__
+model.pkl
+odds*
+*.csv
