@@ -6,3 +6,5 @@ This project attempts to predict NBA game winners against the bookmakers using s
 - [brain](https://github.com/martosinc/betting/tree/main/brain): simple python script for fast and easy predictions/data loading
 - [model](https://github.com/martosinc/betting/tree/main/model): model training and evaluation jupyter notebooks, as well as betting strategy
 - [parser](https://github.com/martosinc/betting/tree/main/parser): clone of my [parser](https://github.com/martosinc/nba-parser)
+## Additional Assets
+- Model Evaultion: model is evaluated based on bookmakers odds from a kaggle [dataset](https://www.kaggle.com/datasets/erichqiu/nba-odds-and-scores)
